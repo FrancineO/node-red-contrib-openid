@@ -172,5 +172,5 @@ module.exports = function (RED) {
       })
     })
   }
-  RED.nodes.registerType('openid', OpenIDRequestNode)
+  RED.nodes.registerType('openid-ffdc', OpenIDRequestNode)
 }

@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/FrancineO/node-red-contrib-openid-ffdc"
+    "url": "https://github.com/FrancineO/node-red-contrib-openid"
   },
   "license": "Apache-2.0",
   "keywords": [

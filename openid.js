@@ -49,6 +49,14 @@ module.exports = function (RED) {
     const client_id = req.query.clientId
     const client_secret = req.query.clientSecret
     const scopes = req.query.scopes.trim() !== '' ? req.query.scopes.trim() : 'openid email offline_access'
+    
+    function uuidv4() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
 
     Issuer.discover(discovery_url).then((issuer) => {
       const csrf_token = crypto.randomBytes(18).toString('base64').replace(/\//g, '-').replace(/\+/g, '_')
@@ -57,7 +65,8 @@ module.exports = function (RED) {
         redirect_uri,
         scope: scopes,
         state: `${node_id}:${csrf_token}`,
-        access_type: 'offline'
+        access_type: 'offline',
+        nonce: uuidv4()
       })
       res.cookie('csrf', csrf_token)
       res.redirect(authorization_url)

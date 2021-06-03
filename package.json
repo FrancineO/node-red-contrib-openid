@@ -1,5 +1,5 @@
 {
-  "name": "node-red-contrib-openid",
+  "name": "node-red-contrib-openid-ffdc",
   "version": "1.1.0",
   "description": "Node-RED node to integrate OpenID Connect in flows",
   "dependencies": {
@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ncarlier/node-red-contrib-openid"
+    "url": "https://github.com/FrancineO/node-red-contrib-openid-ffdc"
   },
   "license": "Apache-2.0",
   "keywords": [

@@ -19,6 +19,14 @@ module.exports = function (RED) {
 
   const Issuer = require('openid-client').Issuer
   const crypto = require('crypto')
+  const nonce = uuidv4()
+
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
 
   function OpenIDNode (n) {
     RED.nodes.createNode(this, n)
@@ -49,13 +57,6 @@ module.exports = function (RED) {
     const client_id = req.query.clientId
     const client_secret = req.query.clientSecret
     const scopes = req.query.scopes.trim() !== '' ? req.query.scopes.trim() : 'openid email offline_access'
-    
-    function uuidv4() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-    }
 
 
     Issuer.discover(discovery_url).then((issuer) => {
@@ -66,8 +67,9 @@ module.exports = function (RED) {
         scope: scopes,
         state: `${node_id}:${csrf_token}`,
         access_type: 'offline',
-        nonce: uuidv4()
+        nonce: nonce
       })
+      console.log(authorization_url);
       res.cookie('csrf', csrf_token)
       res.redirect(authorization_url)
       RED.nodes.addCredentials(node_id, {
@@ -99,14 +101,15 @@ module.exports = function (RED) {
 
     Issuer.discover(credentials.discovery_url).then(issuer => {
       const client = new issuer.Client(credentials)
-      client.authorizationCallback(credentials.redirect_uri, {code: req.query.code}).then((tokenSet) => {
+      client.authorizationCallback(credentials.redirect_uri, {code: req.query.code}, {nonce: nonce}).then((tokenSet) => {
         const claims = tokenSet.claims
         RED.nodes.addCredentials(node_id, Object.assign({}, credentials, {
           id_token: tokenSet.id_token,
           refresh_token: tokenSet.refresh_token,
           access_token: tokenSet.access_token,
           expires_at: tokenSet.expires_at,
-          display_name: claims.preferred_username || claims.email || 'nobody'
+          display_name: claims.preferred_username || claims.email || 'nobody',
+          nonce: uuidv4()
         }))
         return res.send(RED._('openid.error.authorized'))
       }, err => {
@@ -172,5 +175,5 @@ module.exports = function (RED) {
       })
     })
   }
-  RED.nodes.registerType('openid-ffdc', OpenIDRequestNode)
+  RED.nodes.registerType('openid', OpenIDRequestNode)
 }

@@ -17,7 +17,7 @@
   ],
   "node-red": {
     "nodes": {
-      "openid": "openid.js"
+      "openid-ffdc": "openid.js"
     }
   },
   "author": {
